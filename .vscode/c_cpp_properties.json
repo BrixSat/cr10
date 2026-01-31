@@ -1,0 +1,57 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "/home/xarevision/Marlin_cr10/Marlin",
+                "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "/home/xarevision/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "/home/xarevision/.platformio/packages/framework-arduino-avr/variants/sanguino",
+                "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/home/xarevision/Marlin_cr10/Marlin",
+                    "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "/home/xarevision/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "/home/xarevision/.platformio/packages/framework-arduino-avr/variants/sanguino",
+                    "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=60118",
+                "ARDUINO_AVR_SANGUINO",
+                "__MARLIN_FIRMWARE__",
+                "NDEBUG",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "__AVR_ATmega1284P__",
+                ""
+            ],
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++17",
+            "compilerPath": "/home/xarevision/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
+            "compilerArgs": [
+                "-mcall-prologues",
+                "-mmcu=atmega1284p",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}
