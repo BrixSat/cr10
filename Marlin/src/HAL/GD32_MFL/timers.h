@@ -29,30 +29,26 @@
 // Defines
 // ------------------------
 
+// Timer configuration constants
+#define STEPPER_TIMER_RATE    2000000
+#define TEMP_TIMER_FREQUENCY  1000
+
 // Timer instance definitions
 #define MF_TIMER_STEP     3
 #define MF_TIMER_TEMP     1
 #define MF_TIMER_PULSE    MF_TIMER_STEP
 
-typedef uint32_t hal_timer_t;
-#define HAL_TIMER_TYPE_MAX hal_timer_t(UINT16_MAX)
+#define hal_timer_t         uint32_t
+#define HAL_TIMER_TYPE_MAX  UINT16_MAX
 
-#ifndef HAL_TIMER_RATE
-  extern uint32_t GetStepperTimerClkFreq();
-  #define HAL_TIMER_RATE GetStepperTimerClkFreq()
-#endif
-
-// Timer configuration constants
-#define STEPPER_TIMER_RATE    2000000
-#define TEMP_TIMER_FREQUENCY  1000
+extern uint32_t GetStepperTimerClkFreq();
 
 // Timer prescaler calculations
-#define STEPPER_TIMER_PRESCALE      ((HAL_TIMER_RATE) / (STEPPER_TIMER_RATE)) // Prescaler = 30
-#define STEPPER_TIMER_TICKS_PER_US  ((STEPPER_TIMER_RATE) / 1000000UL)        // (MHz) Stepper Timer ticks per µs
-
-// Pulse Timer (counter) calculations
-#define PULSE_TIMER_RATE            STEPPER_TIMER_RATE                        // (Hz) Frequency of Pulse Timer
+#define STEPPER_TIMER_PRESCALE      (GetStepperTimerClkFreq() / STEPPER_TIMER_RATE) // Prescaler = 30
 #define PULSE_TIMER_PRESCALE        STEPPER_TIMER_PRESCALE
+#define STEPPER_TIMER_TICKS_PER_US  ((STEPPER_TIMER_RATE) / 1000000)                // Stepper timer ticks per µs
+#define PULSE_TIMER_RATE            STEPPER_TIMER_RATE
+#define PULSE_TIMER_TICKS_PER_US    STEPPER_TIMER_TICKS_PER_US
 
 // Timer interrupt priorities
 #define STEP_TIMER_IRQ_PRIORITY 2
@@ -145,5 +141,5 @@ FORCE_INLINE static void HAL_timer_set_compare(const uint8_t timer_number, const
   }
 }
 
-inline void HAL_timer_isr_prologue(const uint8_t) {}
-inline void HAL_timer_isr_epilogue(const uint8_t) {}
+#define HAL_timer_isr_prologue(T) NOOP
+#define HAL_timer_isr_epilogue(T) NOOP

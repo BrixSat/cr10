@@ -156,43 +156,38 @@ void stepperTask(void *parameter) {
 
     while (dma.rw_pos < DMA_SAMPLE_COUNT) {
 
-      if (using_ftMotion) {
+      #if ENABLED(FT_MOTION)
 
-        #if ENABLED(FT_MOTION)
+        if (using_ftMotion) {
           if (!nextMainISR) stepper.ftMotion_stepper();
           nextMainISR = 0;
-        #endif
+        }
 
-      }
-      else {
+      #endif
 
-        #if HAS_STANDARD_MOTION
-
-          if (!nextMainISR) {
-            stepper.pulse_phase_isr();
-            nextMainISR = stepper.block_phase_isr();
+      if (!using_ftMotion) {
+        if (!nextMainISR) {
+          stepper.pulse_phase_isr();
+          nextMainISR = stepper.block_phase_isr();
+        }
+        #if ENABLED(LIN_ADVANCE)
+          else if (!nextAdvanceISR) {
+            stepper.advance_isr();
+            nextAdvanceISR = stepper.la_interval;
           }
-          #if ENABLED(LIN_ADVANCE)
-            else if (!nextAdvanceISR) {
-              stepper.advance_isr();
-              nextAdvanceISR = stepper.la_interval;
-            }
-          #endif
-          else
-            i2s_push_sample();
+        #endif
+        else
+          i2s_push_sample();
 
-          nextMainISR--;
+        nextMainISR--;
 
-          #if ENABLED(LIN_ADVANCE)
-            if (nextAdvanceISR == stepper.LA_ADV_NEVER)
-              nextAdvanceISR = stepper.la_interval;
+        #if ENABLED(LIN_ADVANCE)
+          if (nextAdvanceISR == stepper.LA_ADV_NEVER)
+            nextAdvanceISR = stepper.la_interval;
 
-            if (nextAdvanceISR && nextAdvanceISR != stepper.LA_ADV_NEVER)
-              nextAdvanceISR--;
-          #endif
-
-        #endif // HAS_STANDARD_MOTION
-
+          if (nextAdvanceISR && nextAdvanceISR != stepper.LA_ADV_NEVER)
+            nextAdvanceISR--;
+        #endif
       }
     }
   }

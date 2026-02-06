@@ -100,9 +100,7 @@
 
 enum side_t : uint8_t {
   TOP, RIGHT, FRONT, LEFT, BACK, NUM_SIDES,
-  LIST_N(DOUBLE(SECONDARY_AXES),
-    IMINIMUM, IMAXIMUM, JMINIMUM, JMAXIMUM, KMINIMUM, KMAXIMUM,
-    UMINIMUM, UMAXIMUM, VMINIMUM, VMAXIMUM, WMINIMUM, WMAXIMUM)
+  LIST_N(DOUBLE(SECONDARY_AXES), IMINIMUM, IMAXIMUM, JMINIMUM, JMAXIMUM, KMINIMUM, KMAXIMUM, UMINIMUM, UMAXIMUM, VMINIMUM, VMAXIMUM, WMINIMUM, WMAXIMUM)
 };
 
 static constexpr xyz_pos_t true_center CALIBRATION_OBJECT_CENTER;
@@ -468,54 +466,102 @@ inline void probe_sides(measurements_t &m, const float uncertainty) {
 
   inline void report_measured_center(const measurements_t &m) {
     SERIAL_ECHOLNPGM("Center:");
-    TERF(HAS_X_CENTER, SERIAL_ECHOLNPGM_P)(SP_X_STR, m.obj_center.x);
-    TERF(HAS_Y_CENTER, SERIAL_ECHOLNPGM_P)(SP_Y_STR, m.obj_center.y);
+    #if HAS_X_CENTER
+      SERIAL_ECHOLNPGM_P(SP_X_STR, m.obj_center.x);
+    #endif
+    #if HAS_Y_CENTER
+      SERIAL_ECHOLNPGM_P(SP_Y_STR, m.obj_center.y);
+    #endif
     SERIAL_ECHOLNPGM_P(SP_Z_STR, m.obj_center.z);
-    TERF(HAS_I_CENTER, SERIAL_ECHOLNPGM_P)(SP_I_STR, m.obj_center.i);
-    TERF(HAS_J_CENTER, SERIAL_ECHOLNPGM_P)(SP_J_STR, m.obj_center.j);
-    TERF(HAS_K_CENTER, SERIAL_ECHOLNPGM_P)(SP_K_STR, m.obj_center.k);
-    TERF(HAS_U_CENTER, SERIAL_ECHOLNPGM_P)(SP_U_STR, m.obj_center.u);
-    TERF(HAS_V_CENTER, SERIAL_ECHOLNPGM_P)(SP_V_STR, m.obj_center.v);
-    TERF(HAS_W_CENTER, SERIAL_ECHOLNPGM_P)(SP_W_STR, m.obj_center.w);
+    #if HAS_I_CENTER
+      SERIAL_ECHOLNPGM_P(SP_I_STR, m.obj_center.i);
+    #endif
+    #if HAS_J_CENTER
+      SERIAL_ECHOLNPGM_P(SP_J_STR, m.obj_center.j);
+    #endif
+    #if HAS_K_CENTER
+      SERIAL_ECHOLNPGM_P(SP_K_STR, m.obj_center.k);
+    #endif
+    #if HAS_U_CENTER
+      SERIAL_ECHOLNPGM_P(SP_U_STR, m.obj_center.u);
+    #endif
+    #if HAS_V_CENTER
+      SERIAL_ECHOLNPGM_P(SP_V_STR, m.obj_center.v);
+    #endif
+    #if HAS_W_CENTER
+      SERIAL_ECHOLNPGM_P(SP_W_STR, m.obj_center.w);
+    #endif
     SERIAL_EOL();
   }
 
   inline void report_measured_backlash(const measurements_t &m) {
     SERIAL_ECHOLNPGM("Backlash:");
     #if AXIS_CAN_CALIBRATE(X)
-      TERF(CALIBRATION_MEASURE_LEFT, SERIAL_ECHOLNPGM)("  Left: ", m.backlash[LEFT]);
-      TERF(CALIBRATION_MEASURE_RIGHT, SERIAL_ECHOLNPGM)("  Right: ", m.backlash[RIGHT]);
+      #if ENABLED(CALIBRATION_MEASURE_LEFT)
+        SERIAL_ECHOLNPGM("  Left: ", m.backlash[LEFT]);
+      #endif
+      #if ENABLED(CALIBRATION_MEASURE_RIGHT)
+        SERIAL_ECHOLNPGM("  Right: ", m.backlash[RIGHT]);
+      #endif
     #endif
     #if AXIS_CAN_CALIBRATE(Y)
-      TERF(CALIBRATION_MEASURE_FRONT, SERIAL_ECHOLNPGM)("  Front: ", m.backlash[FRONT]);
-      TERF(CALIBRATION_MEASURE_BACK, SERIAL_ECHOLNPGM)("  Back: ", m.backlash[BACK]);
+      #if ENABLED(CALIBRATION_MEASURE_FRONT)
+        SERIAL_ECHOLNPGM("  Front: ", m.backlash[FRONT]);
+      #endif
+      #if ENABLED(CALIBRATION_MEASURE_BACK)
+        SERIAL_ECHOLNPGM("  Back: ", m.backlash[BACK]);
+      #endif
     #endif
     #if AXIS_CAN_CALIBRATE(Z)
       SERIAL_ECHOLNPGM("  Top: ", m.backlash[TOP]);
     #endif
     #if AXIS_CAN_CALIBRATE(I)
-      TERF(CALIBRATION_MEASURE_IMIN, SERIAL_ECHOLNPGM)("  " STR_I_MIN ": ", m.backlash[IMINIMUM]);
-      TERF(CALIBRATION_MEASURE_IMAX, SERIAL_ECHOLNPGM)("  " STR_I_MAX ": ", m.backlash[IMAXIMUM]);
+      #if ENABLED(CALIBRATION_MEASURE_IMIN)
+        SERIAL_ECHOLNPGM("  " STR_I_MIN ": ", m.backlash[IMINIMUM]);
+      #endif
+      #if ENABLED(CALIBRATION_MEASURE_IMAX)
+        SERIAL_ECHOLNPGM("  " STR_I_MAX ": ", m.backlash[IMAXIMUM]);
+      #endif
     #endif
     #if AXIS_CAN_CALIBRATE(J)
-      TERF(CALIBRATION_MEASURE_JMIN, SERIAL_ECHOLNPGM)("  " STR_J_MIN ": ", m.backlash[JMINIMUM]);
-      TERF(CALIBRATION_MEASURE_JMAX, SERIAL_ECHOLNPGM)("  " STR_J_MAX ": ", m.backlash[JMAXIMUM]);
+      #if ENABLED(CALIBRATION_MEASURE_JMIN)
+        SERIAL_ECHOLNPGM("  " STR_J_MIN ": ", m.backlash[JMINIMUM]);
+      #endif
+      #if ENABLED(CALIBRATION_MEASURE_JMAX)
+        SERIAL_ECHOLNPGM("  " STR_J_MAX ": ", m.backlash[JMAXIMUM]);
+      #endif
     #endif
     #if AXIS_CAN_CALIBRATE(K)
-      TERF(CALIBRATION_MEASURE_KMIN, SERIAL_ECHOLNPGM)("  " STR_K_MIN ": ", m.backlash[KMINIMUM]);
-      TERF(CALIBRATION_MEASURE_KMAX, SERIAL_ECHOLNPGM)("  " STR_K_MAX ": ", m.backlash[KMAXIMUM]);
+      #if ENABLED(CALIBRATION_MEASURE_KMIN)
+        SERIAL_ECHOLNPGM("  " STR_K_MIN ": ", m.backlash[KMINIMUM]);
+      #endif
+      #if ENABLED(CALIBRATION_MEASURE_KMAX)
+        SERIAL_ECHOLNPGM("  " STR_K_MAX ": ", m.backlash[KMAXIMUM]);
+      #endif
     #endif
     #if AXIS_CAN_CALIBRATE(U)
-      TERF(CALIBRATION_MEASURE_UMIN, SERIAL_ECHOLNPGM)("  " STR_U_MIN ": ", m.backlash[UMINIMUM]);
-      TERF(CALIBRATION_MEASURE_UMAX, SERIAL_ECHOLNPGM)("  " STR_U_MAX ": ", m.backlash[UMAXIMUM]);
+      #if ENABLED(CALIBRATION_MEASURE_UMIN)
+        SERIAL_ECHOLNPGM("  " STR_U_MIN ": ", m.backlash[UMINIMUM]);
+      #endif
+      #if ENABLED(CALIBRATION_MEASURE_UMAX)
+        SERIAL_ECHOLNPGM("  " STR_U_MAX ": ", m.backlash[UMAXIMUM]);
+      #endif
     #endif
     #if AXIS_CAN_CALIBRATE(V)
-      TERF(CALIBRATION_MEASURE_VMIN, SERIAL_ECHOLNPGM)("  " STR_V_MIN ": ", m.backlash[VMINIMUM]);
-      TERF(CALIBRATION_MEASURE_VMAX, SERIAL_ECHOLNPGM)("  " STR_V_MAX ": ", m.backlash[VMAXIMUM]);
+      #if ENABLED(CALIBRATION_MEASURE_VMIN)
+        SERIAL_ECHOLNPGM("  " STR_V_MIN ": ", m.backlash[VMINIMUM]);
+      #endif
+      #if ENABLED(CALIBRATION_MEASURE_VMAX)
+        SERIAL_ECHOLNPGM("  " STR_V_MAX ": ", m.backlash[VMAXIMUM]);
+      #endif
     #endif
     #if AXIS_CAN_CALIBRATE(W)
-      TERF(CALIBRATION_MEASURE_WMIN, SERIAL_ECHOLNPGM)("  " STR_W_MIN ": ", m.backlash[WMINIMUM]);
-      TERF(CALIBRATION_MEASURE_WMAX, SERIAL_ECHOLNPGM)("  " STR_W_MAX ": ", m.backlash[WMAXIMUM]);
+      #if ENABLED(CALIBRATION_MEASURE_WMIN)
+        SERIAL_ECHOLNPGM("  " STR_W_MIN ": ", m.backlash[WMINIMUM]);
+      #endif
+      #if ENABLED(CALIBRATION_MEASURE_WMAX)
+        SERIAL_ECHOLNPGM("  " STR_W_MAX ": ", m.backlash[WMAXIMUM]);
+      #endif
     #endif
     SERIAL_EOL();
   }
@@ -556,8 +602,12 @@ inline void probe_sides(measurements_t &m, const float uncertainty) {
 
   inline void report_measured_nozzle_dimensions(const measurements_t &m) {
     SERIAL_ECHOLNPGM("Nozzle Tip Outer Dimensions:");
-    TERF(HAS_X_CENTER, SERIAL_ECHOLNPGM_P)(SP_X_STR, m.nozzle_outer_dimension.x);
-    TERF(HAS_Y_CENTER, SERIAL_ECHOLNPGM_P)(SP_Y_STR, m.nozzle_outer_dimension.y);
+    #if HAS_X_CENTER
+      SERIAL_ECHOLNPGM_P(SP_X_STR, m.nozzle_outer_dimension.x);
+    #endif
+    #if HAS_Y_CENTER
+      SERIAL_ECHOLNPGM_P(SP_Y_STR, m.nozzle_outer_dimension.y);
+    #endif
     SERIAL_EOL();
     UNUSED(m);
   }

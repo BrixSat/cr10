@@ -69,11 +69,8 @@
 // Release PA13/PA14 (led, usb control) from SWD pins
 #define DISABLE_DEBUG
 
-#define BOARD_NEOPIXEL_PIN                  PA8   // LED driving pin
-#ifndef BOARD_HAS_DCDC5V
-  #define BOARD_NEOPIXEL_MAX                  7   // Max number of NEOPIXELS supported on this board
-#else
-  #define BOARD_NEOPIXEL_MAX                 29   // With 5V DC-DC converter
+#ifndef BOARD_NEOPIXEL_PIN
+  #define BOARD_NEOPIXEL_PIN                PA8   // LED driving pin
 #endif
 
 #ifndef PS_ON_PIN

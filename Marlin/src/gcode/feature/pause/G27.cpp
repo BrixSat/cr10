@@ -44,13 +44,8 @@
 void GcodeSuite::G27() {
   // Don't allow nozzle parking without homing first
   if (homing_needed_error()) return;
-  const int16_t pval = parser.intval('P');
-  if (WITHIN(pval, 0, 4)) {
-    nozzle.park(pval);
-    TERN_(SOVOL_SV06_RTS, RTS_MoveAxisHoming());
-  }
-  else
-    SERIAL_ECHOLN(F("?Invalid "), F("[P]arking style (0..4)."));
+  nozzle.park(parser.ushortval('P'));
+  TERN_(SOVOL_SV06_RTS, RTS_MoveAxisHoming());
 }
 
 #endif // NOZZLE_PARK_FEATURE

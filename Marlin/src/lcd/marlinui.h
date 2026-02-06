@@ -48,13 +48,13 @@
 #endif
 
 #if ENABLED(DWIN_CREALITY_LCD)
-  #include "dwin/creality/dwin.h"
+  #include "e3v2/creality/dwin.h"
 #elif ENABLED(DWIN_LCD_PROUI)
-  #include "dwin/proui/dwin.h"
+  #include "e3v2/proui/dwin.h"
 #endif
 
 #if ALL(HAS_STATUS_MESSAGE, IS_DWIN_MARLINUI)
-  #include "dwin/marlinui/marlinui_dwin.h" // for LCD_WIDTH
+  #include "e3v2/marlinui/marlinui_dwin.h" // for LCD_WIDTH
 #endif
 
 typedef bool (*statusResetFunc_t)();
@@ -170,7 +170,7 @@ typedef bool (*statusResetFunc_t)();
     static float axis_value(const AxisEnum axis) {
       return NATIVE_TO_LOGICAL(processing ? destination[axis] : SUM_TERN(IS_KINEMATIC, current_position[axis], offset), axis);
     }
-    static bool apply_diff(const AxisEnum axis, const float diff, const float min, const float max) {
+    static bool apply_diff(const AxisEnum axis, const_float_t diff, const_float_t min, const_float_t max) {
       #if IS_KINEMATIC
         float &valref = offset;
         const float rmin = min - current_position[axis], rmax = max - current_position[axis];
@@ -328,13 +328,9 @@ public:
     #endif
     #if ANY(SHOW_REMAINING_TIME, SET_PROGRESS_MANUALLY)
       static uint32_t _calculated_remaining_time() {
-        #if ANY(REMAINING_TIME_PRIME, REMAINING_TIME_AUTOPRIME)
-          return print_job_timer.remainingTimeEstimate(card.getIndex());
-        #else
-          const uint32_t elapsed = print_job_timer.duration();
-          const progress_t progress = _get_progress();
-          return progress ? elapsed * (100U * (PROGRESS_SCALE) - progress) / progress : 0;
-        #endif
+        const duration_t elapsed = print_job_timer.duration();
+        const progress_t progress = _get_progress();
+        return progress ? elapsed.value * (100 * (PROGRESS_SCALE) - progress) / progress : 0;
       }
       #if ENABLED(SET_REMAINING_TIME)
         static uint32_t remaining_time;
@@ -622,7 +618,7 @@ public:
 
     #if ANY(BABYSTEP_GFX_OVERLAY, MESH_EDIT_GFX_OVERLAY)
       static void zoffset_overlay(const int8_t dir);
-      static void zoffset_overlay(const float zvalue);
+      static void zoffset_overlay(const_float_t zvalue);
     #endif
 
     static void draw_kill_screen();
@@ -667,11 +663,6 @@ public:
     static void preheat_all(const uint8_t m, const uint8_t e=active_extruder) { apply_preheat(m, PT_ALL, e); }
   #endif
 
-  /**
-   * The current screen will time out unless 'defer_return_to_status' is true,
-   * and the display will go back to the Status Screen.
-   * Call this method whenever the user interacts to reset the timeout.
-   */
   static void reset_status_timeout(const millis_t ms) {
     TERN(HAS_SCREEN_TIMEOUT, return_to_status_ms = ms + LCD_TIMEOUT_TO_STATUS, UNUSED(ms));
   }
@@ -743,7 +734,7 @@ public:
     #endif
 
     #if ENABLED(AUTO_BED_LEVELING_UBL)
-      static void ubl_mesh_edit_start(const float initial);
+      static void ubl_mesh_edit_start(const_float_t initial);
       static float ubl_mesh_value();
     #endif
 

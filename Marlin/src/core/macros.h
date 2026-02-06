@@ -25,6 +25,12 @@
   #define __has_include(...) 1
 #endif
 
+#define ABCE 4
+#define XYZE 4
+#define ABC  3
+#define XYZ  3
+#define XY   2
+
 #define _AXIS(A) (A##_AXIS)
 
 #define _FORCE_INLINE_ __attribute__((__always_inline__)) __inline__
@@ -52,7 +58,6 @@
 // Macros to make a string from a macro
 #define STRINGIFY_(M) #M
 #define STRINGIFY(M) STRINGIFY_(M)
-#define CHARIFY(M) STRINGIFY(M)[0]
 
 #define A(CODE) " " CODE "\n\t"
 #define L(CODE) CODE ":\n\t"
@@ -209,10 +214,7 @@
 // "Ternary" that emits or omits the given content
 #define EMIT(V...) V
 #define OMIT(...)
-#define TERN_(O,A)          TERF(O,EMIT)(A)         // OPTION ? 'A' : '<nul>'   ; Usage: TERN_(OPTION, EMITTHIS)
-
-// Call G(...) or swallow with OMIT(...)
-#define TERF(O,G)           _TERN(_ENA_1(O),OMIT,G) // OPTION ? 'G' : 'OMIT'    ; Usage: TERF(OPTION, CALLTHIS)(ARGS...)
+#define TERN_(O,A)          _TERN(_ENA_1(O),OMIT,EMIT)(A) // OPTION ? 'A' : '<nul>'
 
 // Macros to conditionally emit array items and function arguments
 #define _OPTITEM(A...)      A,

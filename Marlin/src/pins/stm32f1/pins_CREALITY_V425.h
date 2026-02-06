@@ -68,13 +68,6 @@
 //
 #define HEATER_0_PIN                        PA0   // HEATER1
 #define HEATER_BED_PIN                      PA1   // HOT BED
-#define FAN0_PIN                            PA2   // FAN0
-#define FAN1_PIN                            PC1   // FAN1
-#define FAN2_PIN                            PC0   // FAN2
-
-//
-// Misc. Functions
-//
-#define LED_PIN                             PC14
+#define FAN0_PIN                            PA2   // FAN
 
 #include "pins_CREALITY_V4.h"

@@ -58,9 +58,6 @@
   #define USART_RX_DMA_SUPPORT 1
 #endif
 
-// SoftwareSerial uses STM32duino API compatibility mode
-#define SOFTWARE_SERIAL_STM32_API_COMPATIBILITY 1
-
 //
 // Misc.
 //

@@ -26,7 +26,11 @@
  */
 
 namespace MMU3 {
-  void power_on();
-  void power_off();
-  void power_reset();
-}
+
+void power_on();
+
+void power_off();
+
+void power_reset();
+
+} // MMU3

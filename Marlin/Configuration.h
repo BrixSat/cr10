@@ -713,16 +713,16 @@
                                   // Set/get with G-code: M301 E[extruder number, 0-2]
 
   // Stock CR-10 tuned for 70C
-  #if ENABLED(PID_PARAMS_PER_HOTEND)
+   #if ENABLED(PID_PARAMS_PER_HOTEND)
     // Specify up to one value per hotend here, according to your setup.
     // If there are fewer values, the last one applies to the remaining hotends.
-    #define DEFAULT_KP_LIST {  22.57,  22.57 }
-    #define DEFAULT_KI_LIST {   1.72,   1.72 }
-    #define DEFAULT_KD_LIST {  73.96,  73.96 }
+    #define DEFAULT_Kp_LIST {  22.57,  22.57 }
+    #define DEFAULT_Ki_LIST {   1.72,   1.72 }
+    #define DEFAULT_Kd_LIST {  73.96,  73.96 }
   #else
-    #define DEFAULT_KP  22.57
-    #define DEFAULT_KI   1.72
-    #define DEFAULT_KD  73.96
+    #define DEFAULT_Kp  22.57
+    #define DEFAULT_Ki   1.72
+    #define DEFAULT_Kd  73.96
   #endif
 #else
   #define BANG_MAX 255    // Limit hotend current while in bang-bang mode; 255=full current
@@ -819,9 +819,9 @@
   //#define PID_BED_DEBUG     // Print Bed PID debug data to the serial port. Use 'M303 D' to enable/disable.
 
   // Stock CR-10 Bed Tuned for 70C
-  #define DEFAULT_BED_KP 426.68
-  #define DEFAULT_BED_KI  78.92
-  #define DEFAULT_BED_KD 576.71
+  #define DEFAULT_bedKp 426.68
+  #define DEFAULT_bedKi  78.92
+  #define DEFAULT_bedKd 576.71
   
 
   // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.

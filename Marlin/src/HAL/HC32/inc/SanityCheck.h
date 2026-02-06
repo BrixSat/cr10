@@ -43,11 +43,8 @@
   #error "FAST_PWM_FAN is not yet implemented for this platform."
 #endif
 
-// SoftwareSerial introduced in arduino core version 1.3.1
-#if ARDUINO_CORE_VERSION_INT < GET_VERSION_INT(1, 3, 1)
-  #if !defined(HAVE_SW_SERIAL) && HAS_TMC_SW_SERIAL
-    #error "Missing SoftwareSerial implementation."
-  #endif
+#if !defined(HAVE_SW_SERIAL) && HAS_TMC_SW_SERIAL
+  #error "Missing SoftwareSerial implementation."
 #endif
 
 #if ENABLED(SDCARD_EEPROM_EMULATION) && !HAS_MEDIA
@@ -86,7 +83,7 @@
   #error "POSTMORTEM_DEBUGGING requires CORE_DISABLE_FAULT_HANDLER to be set."
 #endif
 
-#ifdef PANIC_ENABLE
+#if defined(PANIC_ENABLE)
   #if defined(PANIC_USART1_TX_PIN) || defined(PANIC_USART2_TX_PIN) || defined(PANIC_USART3_TX_PIN) || defined(PANIC_USART3_TX_PIN)
     #error "HC32 HAL uses a custom panic handler. Do not define PANIC_USARTx_TX_PIN."
   #endif

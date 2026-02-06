@@ -60,10 +60,6 @@ extern const char M23_STR[], M24_STR[];
   #include "Sd2Card.h"
 #endif
 
-#if ANY(DO_LIST_BIN_FILES, CUSTOM_FIRMWARE_UPLOAD)
-  #define MEDIA_SUPPORT_BIN_FILES 1
-#endif
-
 typedef struct {
   bool saving:1,                // Receiving a G-code file or logging commands during a print
        logging:1,               // Log enqueued commands to the open file. See GCodeQueue::advance()
@@ -73,7 +69,7 @@ typedef struct {
        filenameIsDir:1,         // The working item is a directory
        workDirIsRoot:1,         // The working directory is / so there's no parent
        abort_sd_printing:1      // Abort by calling abortSDPrinting() at the main loop()
-       #if MEDIA_SUPPORT_BIN_FILES
+       #if DO_LIST_BIN_FILES
          , filenameIsBin:1      // The working item is a BIN file
        #endif
        #if ENABLED(BINARY_FILE_TRANSFER)
@@ -304,8 +300,8 @@ public:
   #endif
 
   // Binary flag for the current file
-  static bool fileIsBinary() { return TERN0(MEDIA_SUPPORT_BIN_FILES, flag.filenameIsBin); }
-  static void setBinFlag(const bool bin) { TERN(MEDIA_SUPPORT_BIN_FILES, flag.filenameIsBin = bin, UNUSED(bin)); }
+  static bool fileIsBinary() { return TERN0(DO_LIST_BIN_FILES, flag.filenameIsBin); }
+  static void setBinFlag(const bool bin) { TERN(DO_LIST_BIN_FILES, flag.filenameIsBin = bin, UNUSED(bin)); }
 
   // Current Working Dir - Set by cd, cdup, cdroot, and diveToFile(true, ...)
   static char* getWorkDirName()  { workDir.getDosName(filename); return filename; }
@@ -353,17 +349,21 @@ private:
   // Alphabetical file and folder sorting
   //
   #if ENABLED(SDCARD_SORT_ALPHA)
-
+    static int16_t sort_count;    // Count of sorted items in the current directory
     #if ENABLED(SDSORT_GCODE)
       static SortFlag sort_alpha; // Sorting: REV, OFF, FWD
       static int8_t sort_folders; // Folder sorting before/none/after
       //static bool sort_reverse; // Flag to enable / disable reverse sorting
     #endif
 
-    static int16_t sort_count;    // Count of sorted items in the current directory
-    static uint8_t *sort_order;   // Pointer to the static or dynamic sort index
+    // By default the sort index is statically allocated
+    #if ENABLED(SDSORT_DYNAMIC_RAM)
+      static uint8_t *sort_order;
+    #else
+      static uint8_t sort_order[SDSORT_LIMIT];
+    #endif
 
-    #if ENABLED(SDSORT_CACHE_NAMES) && DISABLED(SDSORT_DYNAMIC_RAM)
+    #if ALL(SDSORT_USES_RAM, SDSORT_CACHE_NAMES) && DISABLED(SDSORT_DYNAMIC_RAM)
       #define SORTED_LONGNAME_MAXLEN (SDSORT_CACHE_VFATS) * (FILENAME_LENGTH)
       #define SORTED_LONGNAME_STORAGE (SORTED_LONGNAME_MAXLEN + 1)
     #else
@@ -371,17 +371,20 @@ private:
       #define SORTED_LONGNAME_STORAGE SORTED_LONGNAME_MAXLEN
     #endif
 
-    #define SORTED_SHORTNAME_STORAGE FILENAME_LENGTH
-
     // Cache filenames to speed up SD menus.
     #if ENABLED(SDSORT_USES_RAM)
 
-      // Pointers to static or dynamic arrays of sorted names
+      // If using dynamic ram for names, allocate on the heap.
       #if ENABLED(SDSORT_CACHE_NAMES)
-        static char (*sortshort)[SORTED_SHORTNAME_STORAGE];
+        #if ENABLED(SDSORT_DYNAMIC_RAM)
+          static char **sortshort, **sortnames;
+        #else
+          static char sortshort[SDSORT_LIMIT][FILENAME_LENGTH];
+        #endif
       #endif
-      #if ENABLED(SDSORT_CACHE_NAMES) || DISABLED(SDSORT_USES_STACK)
-        static char (*sortnames)[SORTED_LONGNAME_STORAGE];
+
+      #if (ENABLED(SDSORT_CACHE_NAMES) && DISABLED(SDSORT_DYNAMIC_RAM)) || NONE(SDSORT_CACHE_NAMES, SDSORT_USES_STACK)
+        static char sortnames[SDSORT_LIMIT][SORTED_LONGNAME_STORAGE];
       #endif
 
       // Folder sorting uses an isDir array when caching items.
@@ -395,7 +398,6 @@ private:
 
     #endif // SDSORT_USES_RAM
 
-    static void flush_presort();
   #endif // SDCARD_SORT_ALPHA
 
   //
@@ -410,7 +412,7 @@ private:
   //
   // Directory items
   //
-  static bool is_visible_entity(const dir_t &p OPTARG(CUSTOM_FIRMWARE_UPLOAD, const bool binFiles=false));
+  static bool is_visible_entity(const dir_t &p OPTARG(CUSTOM_FIRMWARE_UPLOAD, const bool onlyBin=false));
   static int16_t countVisibleItems(MediaFile dir);
   static void selectByIndex(MediaFile dir, const int16_t index);
   static void selectByName(MediaFile dir, const char * const match);
@@ -418,6 +420,10 @@ private:
     MediaFile parent, const char * const prepend, const uint8_t lsflags
     OPTARG(LONG_FILENAME_HOST_SUPPORT, const char * const prependLong=nullptr)
   );
+
+  #if ENABLED(SDCARD_SORT_ALPHA)
+    static void flush_presort();
+  #endif
 };
 
 #else // !HAS_MEDIA
