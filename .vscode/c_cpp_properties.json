@@ -8,34 +8,32 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "/home/xarevision/Marlin_cr10/Marlin",
-                "/home/xarevision/Marlin_cr10/.pio/libdeps/melzi_optimized/U8glib-HAL/src",
-                "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "/home/xarevision/cr10/Marlin",
                 "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                 "/home/xarevision/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "/home/xarevision/.platformio/packages/framework-arduino-avr/variants/sanguino",
                 "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                 "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                 "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                 ""
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "/home/xarevision/Marlin_cr10/Marlin",
-                    "/home/xarevision/Marlin_cr10/.pio/libdeps/melzi_optimized/U8glib-HAL/src",
-                    "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "/home/xarevision/cr10/Marlin",
                     "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                     "/home/xarevision/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "/home/xarevision/.platformio/packages/framework-arduino-avr/variants/sanguino",
                     "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                     "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                     "/home/xarevision/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                     ""
                 ]
             },
             "defines": [
-                "PLATFORMIO=60118",
+                "PLATFORMIO=60119",
                 "ARDUINO_AVR_SANGUINO",
                 "__MARLIN_FIRMWARE__",
                 "NDEBUG",
