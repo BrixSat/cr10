@@ -35,7 +35,7 @@
 
 // Onboard I2C EEPROM
 #define I2C_EEPROM
-#define MARLIN_EEPROM_SIZE               0x1000U  // 4K (AT24C32)
+#define MARLIN_EEPROM_SIZE                0x1000  // 4K (AT24C32)
 #define I2C_SCL_PIN                         PB8
 #define I2C_SDA_PIN                         PB9
 
@@ -54,17 +54,68 @@
 #define E2_DIAG_PIN                         PB14  // Z+
 
 //
+// Check for additional used endstop pins
+//
+#if HAS_EXTRA_ENDSTOPS
+  #define _ENDSTOP_IS_ANY(ES) X2_USE_ENDSTOP == ES || Y2_USE_ENDSTOP == ES || Z2_USE_ENDSTOP == ES || Z3_USE_ENDSTOP == ES || Z4_USE_ENDSTOP == ES
+  #if _ENDSTOP_IS_ANY(_XMIN_) || _ENDSTOP_IS_ANY(_XMAX_)
+    #define NEEDS_X_MINMAX
+  #endif
+  #if _ENDSTOP_IS_ANY(_YMIN_) || _ENDSTOP_IS_ANY(_YMAX_)
+    #define NEEDS_Y_MINMAX
+  #endif
+  #if _ENDSTOP_IS_ANY(_ZMIN_) || _ENDSTOP_IS_ANY(_ZMAX_)
+    #define NEEDS_Z_MINMAX
+  #endif
+  #undef _ENDSTOP_IS_ANY
+#endif
+
+//
 // Limit Switches
 //
-#define X_STOP_PIN                    X_DIAG_PIN  // X-
-#define Y_STOP_PIN                    Y_DIAG_PIN  // Y-
-#define Z_STOP_PIN                    Z_DIAG_PIN  // Z+
-#define X_OTHR_PIN                   E0_DIAG_PIN  // MT-DET
-#define Y_OTHR_PIN                   E1_DIAG_PIN  // NEOPIXEL
-#define Z_OTHR_PIN                   E2_DIAG_PIN  // PWRDET
+#ifdef X_STALL_SENSITIVITY
+  #define X_STOP_PIN                  X_DIAG_PIN  // X-
+#elif ANY(DUAL_X_CARRIAGE, NEEDS_X_MINMAX)
+  #ifndef X_MIN_PIN
+    #define X_MIN_PIN                 X_DIAG_PIN  // X-
+  #endif
+  #ifndef X_MAX_PIN
+    #define X_MAX_PIN                E0_DIAG_PIN  // MT-DET
+  #endif
+#else
+  #define X_STOP_PIN                  X_DIAG_PIN  // X-
+#endif
 
-#ifndef Z_MIN_PROBE_PIN
-  #define Z_MIN_PROBE_PIN            E2_DIAG_PIN  // Z+
+#ifdef Y_STALL_SENSITIVITY
+  #define Y_STOP_PIN                  Y_DIAG_PIN  // Y-
+#elif ENABLED(NEEDS_Y_MINMAX)
+  #ifndef Y_MIN_PIN
+    #define Y_MIN_PIN                 Y_DIAG_PIN  // Y-
+  #endif
+  #ifndef Y_MAX_PIN
+    #define Y_MAX_PIN                E1_DIAG_PIN  // NEOPIXEL
+  #endif
+#else
+  #define Y_STOP_PIN                  Y_DIAG_PIN  // Y-
+#endif
+
+#ifdef Z_STALL_SENSITIVITY
+  #define Z_STOP_PIN                  Z_DIAG_PIN  // Z-
+#elif ENABLED(NEEDS_Z_MINMAX)
+  #ifndef Z_MIN_PIN
+    #define Z_MIN_PIN                 Z_DIAG_PIN  // Z-
+  #endif
+  #ifndef Z_MAX_PIN
+    #define Z_MAX_PIN                E2_DIAG_PIN  // Z+
+  #endif
+#else
+  #define Z_STOP_PIN                  Z_DIAG_PIN  // Z-
+#endif
+
+#if DISABLED(Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN) || ENABLED(USE_PROBE_FOR_Z_HOMING)
+  #ifndef Z_MIN_PROBE_PIN
+    #define Z_MIN_PROBE_PIN          E2_DIAG_PIN  // defaults to 'Z+' connector
+  #endif
 #endif
 
 //
@@ -210,11 +261,7 @@
 //
 #if HAS_MEDIA
   #ifndef SDCARD_CONNECTION
-    #if ENABLED(NO_LCD_SDCARD)
-      #define SDCARD_CONNECTION          ONBOARD
-    #else
-      #define SDCARD_CONNECTION              LCD
-    #endif
+    #define SDCARD_CONNECTION                LCD
   #endif
   #if SD_CONNECTION_IS(ONBOARD)
     //#define SOFTWARE_SPI
@@ -233,6 +280,7 @@
   #elif SD_CONNECTION_IS(CUSTOM_CABLE)
     #error "CUSTOM_CABLE is not a supported SDCARD_CONNECTION for this board"
   #endif
+  #define SDSS                         SD_SS_PIN
 #endif
 
 //

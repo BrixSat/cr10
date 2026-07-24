@@ -79,20 +79,20 @@ inline void toggle_pins() {
         #endif
       );
       #if AVR_AT90USB1286_FAMILY // Teensy IDEs don't know about these pins so must use FASTIO
-        if (pin == PIN_E2) {
-          SET_OUTPUT(PIN_E2);
+        if (pin == TEENSY_E2) {
+          SET_OUTPUT(TEENSY_E2);
           for (int16_t j = 0; j < repeat; j++) {
-            WRITE(PIN_E2, LOW);  safe_delay(wait);
-            WRITE(PIN_E2, HIGH); safe_delay(wait);
-            WRITE(PIN_E2, LOW);  safe_delay(wait);
+            WRITE(TEENSY_E2, LOW);  safe_delay(wait);
+            WRITE(TEENSY_E2, HIGH); safe_delay(wait);
+            WRITE(TEENSY_E2, LOW);  safe_delay(wait);
           }
         }
-        else if (pin == PIN_E3) {
-          SET_OUTPUT(PIN_E3);
+        else if (pin == TEENSY_E3) {
+          SET_OUTPUT(TEENSY_E3);
           for (int16_t j = 0; j < repeat; j++) {
-            WRITE(PIN_E3, LOW);  safe_delay(wait);
-            WRITE(PIN_E3, HIGH); safe_delay(wait);
-            WRITE(PIN_E3, LOW);  safe_delay(wait);
+            WRITE(TEENSY_E3, LOW);  safe_delay(wait);
+            WRITE(TEENSY_E3, HIGH); safe_delay(wait);
+            WRITE(TEENSY_E3, LOW);  safe_delay(wait);
           }
         }
         else
@@ -141,15 +141,26 @@ inline void servo_probe_test() {
     bool deploy_state = false, stow_state;
 
     #if ENABLED(Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN)
+
       #define PROBE_TEST_PIN Z_MIN_PIN
       #define _PROBE_PREF "Z_MIN"
+      constexpr bool probe_inverting = Z_MIN_ENDSTOP_INVERTING;
+
+      SERIAL_ECHOLNPGM(". Probe Z_MIN_PIN: ", PROBE_TEST_PIN);
+      SERIAL_ECHOPGM(". Z_MIN_ENDSTOP_INVERTING: ");
+
     #else
+
       #define PROBE_TEST_PIN Z_MIN_PROBE_PIN
       #define _PROBE_PREF "Z_MIN_PROBE"
+      constexpr bool probe_inverting = Z_MIN_PROBE_ENDSTOP_INVERTING;
+
+      SERIAL_ECHOLNPGM(". Probe Z_MIN_PROBE_PIN: ", PROBE_TEST_PIN);
+      SERIAL_ECHOPGM(   ". Z_MIN_PROBE_ENDSTOP_INVERTING: ");
+
     #endif
 
-    SERIAL_ECHOLNPGM(". Probe " _PROBE_PREF "_PIN: ", PROBE_TEST_PIN);
-    serial_ternary(F(". " _PROBE_PREF "_ENDSTOP_HIT_STATE: "), PROBE_HIT_STATE, F("HIGH"), F("LOW"));
+    serialprint_truefalse(probe_inverting);
     SERIAL_EOL();
 
     SET_INPUT_PULLUP(PROBE_TEST_PIN);
@@ -166,11 +177,11 @@ inline void servo_probe_test() {
       SERIAL_ECHOLNPGM(". Check for BLTOUCH");
       bltouch._reset();
       bltouch._stow();
-      if (!PROBE_TRIGGERED()) {
+      if (probe_inverting == READ(PROBE_TEST_PIN)) {
         bltouch._set_SW_mode();
-        if (PROBE_TRIGGERED()) {
+        if (probe_inverting != READ(PROBE_TEST_PIN)) {
           bltouch._deploy();
-          if (!PROBE_TRIGGERED()) {
+          if (probe_inverting == READ(PROBE_TEST_PIN)) {
             bltouch._stow();
             SERIAL_ECHOLNPGM("= BLTouch Classic 1.2, 1.3, Smart 1.0, 2.0, 2.2, 3.0, 3.1 detected.");
             // Check for a 3.1 by letting the user trigger it, later
@@ -198,7 +209,7 @@ inline void servo_probe_test() {
         stow_state = READ(PROBE_TEST_PIN);
       }
 
-      if (PROBE_HIT_STATE == deploy_state) SERIAL_ECHOLNPGM("WARNING: " _PROBE_PREF "_ENDSTOP_HIT_STATE is probably wrong.");
+      if (probe_inverting != deploy_state) SERIAL_ECHOLNPGM("WARNING: " _PROBE_PREF "_ENDSTOP_INVERTING is probably wrong.");
 
       if (deploy_state != stow_state) {
         SERIAL_ECHOLNPGM("= Mechanical Switch detected");
@@ -294,7 +305,9 @@ void GcodeSuite::M43() {
   // 'E' Enable or disable endstop monitoring and return
   if (parser.seen('E')) {
     endstops.monitor_flag = parser.value_bool();
-    SERIAL_ECHOLN(F("endstop monitor "), endstops.monitor_flag ? F("en") : F("dis"), F("abled"));
+    SERIAL_ECHOPGM("endstop monitor ");
+    SERIAL_ECHOF(endstops.monitor_flag ? F("en") : F("dis"));
+    SERIAL_ECHOLNPGM("abled");
     return;
   }
 

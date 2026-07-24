@@ -31,6 +31,8 @@
 
 #if ENABLED(EXTENSIBLE_UI)
   #include "../../lcd/extui/ui_api.h"
+#elif ENABLED(DWIN_LCD_PROUI)
+  #include "../../lcd/e3v2/proui/dwin.h"
 #endif
 
 /**
@@ -49,8 +51,10 @@ void GcodeSuite::M303() {
 
   #if HAS_PID_DEBUG
     if (parser.seen_test('D')) {
-      FLIP(thermalManager.pid_debug_flag);
-      SERIAL_ECHO_MSG("PID Debug ", ON_OFF(thermalManager.pid_debug_flag));
+      thermalManager.pid_debug_flag ^= true;
+      SERIAL_ECHO_START();
+      SERIAL_ECHOPGM("PID Debug ");
+      serialprintln_onoff(thermalManager.pid_debug_flag);
       return;
     }
   #endif
@@ -64,22 +68,36 @@ void GcodeSuite::M303() {
     default:
       SERIAL_ECHOPGM(STR_PID_AUTOTUNE);
       SERIAL_ECHOLNPGM(STR_PID_BAD_HEATER_ID);
-      TERN_(EXTENSIBLE_UI, ExtUI::onPIDTuning(ExtUI::pidresult_t::PID_BAD_HEATER_ID));
+      TERN_(EXTENSIBLE_UI, ExtUI::onPidTuning(ExtUI::result_t::PID_BAD_EXTRUDER_NUM));
+      TERN_(DWIN_LCD_PROUI, DWIN_PidTuning(PID_BAD_EXTRUDER_NUM));
       return;
   }
 
-  const bool seenC = parser.seenval('C');
-  const int c = seenC ? parser.value_int() : 5;
+  const int cycles = parser.intval('C', 5);
+  if (cycles < 3) {
+    SERIAL_ECHOLNPGM("?(C)ycles not plausible (>=3).");
+    return;
+  }
+
   const bool seenS = parser.seenval('S');
   const celsius_t temp = seenS ? parser.value_celsius() : default_temp;
-  const bool u = parser.boolval('U');
+  const bool uflag = parser.boolval('U');
 
-  TERN_(EXTENSIBLE_UI, ExtUI::onStartM303(c, hid, temp));
+  #if ENABLED(DWIN_LCD_PROUI) && ANY(PIDTEMP, PIDTEMPBED)
+    HMI_data.PidCycles = cycles;
+    if (seenS) {
+      switch (hid) {
+        OPTCODE(PIDTEMP,    case 0 ... HOTENDS - 1: HMI_data.HotendPidT = temp; break)
+        OPTCODE(PIDTEMPBED, case H_BED:             HMI_data.BedPidT = temp;    break)
+        default: break;
+      }
+    }
+  #endif
 
   IF_DISABLED(BUSY_WHILE_HEATING, KEEPALIVE_STATE(NOT_BUSY));
 
   LCD_MESSAGE(MSG_PID_AUTOTUNE);
-  thermalManager.PID_autotune(temp, hid, c, u);
+  thermalManager.PID_autotune(temp, hid, cycles, uflag);
   ui.reset_status();
 
   queue.flush_rx();
